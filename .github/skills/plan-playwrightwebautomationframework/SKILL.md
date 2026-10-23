@@ -1,3 +1,8 @@
+---
+name: plan-playwrightwebautomationframework
+description: plan-playwrightWebAutomationFramework
+disable-model-invocation: true
+---
 ## Plan: Playwright Web Test Framework
 
 Create a reusable C#/.NET 10 LTS test framework for web UI and HTTP API behavior using Playwright and NUnit. Generate ExtentReports HTML output, capture structured Serilog logs and failure artifacts, and keep target URLs and credentials configurable. The workspace is empty, so this is a starter framework; real application selectors, endpoints, auth flows, and acceptance tests will be added once an application contract is available.

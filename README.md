@@ -28,10 +28,15 @@ The local smoke tests start a Kestrel fixture on a dynamically assigned loopback
 
 Choose the browser for UI tests with an environment override:
 
-```powershell
+```powershell -- for browser change
 $env:E2E_Automation__Browser = "firefox"
 dotnet test WebApp.Automation.slnx --filter "TestCategory=UI"
 Remove-Item Env:E2E_Automation__Browser
+```
+```powershell -- for headless change
+$env:E2E_Automation__Headless = "false"
+dotnet test .\WebApp.Automation.slnx --filter "TestCategory=UI"
+Remove-Item Env:E2E_Automation__Headless
 ```
 
 Supported browser values are `chromium` and `firefox`. Set `E2E_Automation__Headless=false` to show the browser. Browser selection applies to the UI tests; the API tests do not launch a browser.
@@ -47,13 +52,13 @@ $env:E2E_Automation__BaseUrl = "https://test.example.invalid"
 
 The sample tests use only the local fixture. `BaseUrl` and `ApiBaseUrl` are extension points for application-specific tests. Add credentials through your environment or secret store; never commit them or send them in chat. Keep generated logs, reports, screenshots, and traces access-controlled because they may contain application data.
 
-Settings include browser, headless mode, timeout, artifact directory, report path, log path, and optional application/API base URLs. Invalid browser and timeout values fail fast with a configuration error.
+Settings include browser, headless mode, optional screenshots for passed UI tests (`Automation:CaptureScreenshotsOnPass`), timeout, artifact directory, report path, log path, and optional application/API base URLs. Invalid browser and timeout values fail fast with a configuration error.
 
 ## Outputs
 
 - ExtentReports HTML: `artifacts/extent-report-<UTC timestamp>-<run-id>.html` in the solution-root `artifacts/` directory (unique per run)
 - Serilog rolling files: `artifacts/logs/`
-- Failure screenshots and Playwright traces: `artifacts/`
+- UI screenshots (failures always, passing tests when `CaptureScreenshotsOnPass` is enabled) and Playwright traces: `artifacts/`. Screenshots are attached to the ExtentReports test entry.
 
 UI failures attach screenshots to the HTML report and save Playwright traces for inspection with `pwsh <path-to-playwright.ps1> show-trace <trace.zip>`. API test failures are recorded in the report and log. The default `Automation:ReportPath` is `artifacts/extent-report-{RunId}.html`; `{RunId}` is replaced with a UTC timestamp and unique identifier. Include `{RunId}` in custom paths to retain per-run report isolation; a custom path without the token is used as-is.
 

@@ -6,12 +6,24 @@ public sealed class AutomationSettings
 {
     public string Browser { get; init; } = "chromium";
     public bool Headless { get; init; } = true;
+    public bool CaptureScreenshotsOnPass { get; init; }
     public int TimeoutMs { get; init; } = 30000;
     public string ArtifactDirectory { get; init; } = "artifacts";
     public string ReportPath { get; init; } = "artifacts/extent-report-{RunId}.html";
     public string LogPath { get; init; } = "artifacts/logs/automation-.log";
     public string? BaseUrl { get; init; }
     public string? ApiBaseUrl { get; init; }
+
+    public string GetBaseUrl()
+    {
+        if (string.IsNullOrWhiteSpace(BaseUrl) || !Uri.TryCreate(BaseUrl, UriKind.Absolute, out _))
+        {
+            throw new InvalidOperationException(
+                "Configure Automation:BaseUrl (environment prefix: E2E_) before running app UI tests.");
+        }
+
+        return BaseUrl;
+    }
 
     public static AutomationSettings Load()
     {

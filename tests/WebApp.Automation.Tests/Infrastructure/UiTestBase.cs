@@ -44,20 +44,27 @@ public abstract class UiTestBase : TestBase
     {
         var failed = TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed;
         var settings = AutomationRuntime.Settings;
+        var capturePassedScreenshot =
+            TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Passed &&
+            settings.CaptureScreenshotsOnPass;
 
         if (_browserContext is not null)
         {
-            if (failed && _page is not null)
+            if ((failed || capturePassedScreenshot) && _page is not null)
             {
                 try
                 {
                     var screenshotPath = ArtifactPaths.Create(settings, ".png");
                     await _page.ScreenshotAsync(new PageScreenshotOptions { Path = screenshotPath, FullPage = true });
                     ReportTest.AddScreenCaptureFromPath(screenshotPath);
+                    TestLogger.Information("Captured test screenshot at {ScreenshotPath}", screenshotPath);
                 }
                 catch (Exception exception)
                 {
-                    TestLogger.Warning("Could not capture failure screenshot ({ErrorType})", exception.GetType().Name);
+                    TestLogger.Warning(
+                        "Could not capture {TestOutcome} screenshot ({ErrorType})",
+                        failed ? "failure" : "passing",
+                        exception.GetType().Name);
                 }
             }
 
